@@ -189,8 +189,8 @@ void Screen::Writeout() {
 	ofstream f("../../out.txt", fstream::out); assert(f);
 	for (int i = 0; i < 3; i++) {
 		f << "Design " << i + 1 << endl;
-		string line = to_string(Totalhl.at(i)) + " ft^2/s^2" + to_string(Win.at(i)) + " kW" +
-			to_string(pCost.at(i)) + " $" + to_string(opCost.at(i)) + " $";
+		string line = to_string(Totalhl.at(i)) + " ft^2/s^2, " + to_string(Win.at(i)) + " kW, " +
+			to_string(pCost.at(i)) + " $, " + to_string(opCost.at(i)) + " $";
 		f << line << endl;
 	}
 }
