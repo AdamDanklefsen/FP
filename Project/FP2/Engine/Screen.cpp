@@ -183,7 +183,7 @@ void Screen::FlushButtonPress() {
 
 void Screen::Writeout() {
 	using namespace std;
-	fstream f("../../out.txt");
+	ofstream f("../../out.txt", fstream::out); assert(f);
 	for (int i = 0; i < 3; i++) {
 		f << "Design " << i + 1 << endl;
 		string line = to_string(Totalhl.at(i)) + " " + to_string(Win.at(i)) + " " +
