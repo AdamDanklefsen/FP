@@ -28,6 +28,7 @@ public:
 
 	std::vector<double> Totalhl, Win, pCost, opCost;
 	double eleCost = 1.96/100; // $/kWh 
+	SwitchState* pTest;
 
 private:
 	Graphics &gfx;

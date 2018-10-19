@@ -26,7 +26,11 @@ Game::Game( MainWindow& wnd )
 	wnd( wnd ),
 	gfx( wnd ),
 	scr(gfx,wnd.mouse),
+
+
 	backg("../../cap.bmp", gfx),
+
+
 	pic(Vec2D(455, 128), Vec2D(455, 128) + Vec2D(961, 836)) {
 	gfx.setWinPos(wnd.getHWND(), 128,72);
 }

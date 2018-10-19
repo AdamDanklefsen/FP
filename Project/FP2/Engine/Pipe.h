@@ -7,7 +7,7 @@
 #include <assert.h>
 #include <functional>
 
-enum pPrice {
+typedef enum pPrice {
 	D1p25 = 383,
 	D1p5 = 5443,
 	D2 = 776,

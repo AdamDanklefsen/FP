@@ -9,7 +9,7 @@
 #include "Text.h"
 #include <functional>
 
-enum DesignNumber {
+typedef enum DesignNumber {
 	Design_1,
 	Design_2,
 	Design_3

@@ -5,18 +5,14 @@
 #include "Mouse.h"
 #include "Text.h"
 
-typedef enum SwitchState {
-	ON, // Day   // State Prop
-	OFF // Night // Pipe Prop
+typedef enum class SwitchState {
+	ON = 0, // Day   // State Prop
+	OFF = 1 // Night // Pipe Prop
 };
-enum SwitchType {
-	DayNight,
-	Prop
+typedef enum class SwitchType {
+	DayNight = 0,
+	Prop = 1
 };
-inline SwitchState& operator!(SwitchState& s){
-	s = SwitchState((int(s) + 1) % 2);
-	return(s);
-}
 
 class Switch {
 public:
@@ -30,7 +26,7 @@ public:
 	Rect R, RL, RR;
 	Text TL, TR;
 	int border = 2;
-	SwitchState toggle = OFF;
-	SwitchType type;
+	SwitchState toggle = SwitchState::OFF;
+	SwitchType type = SwitchType::Prop;
 };
 

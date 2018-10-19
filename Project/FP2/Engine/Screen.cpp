@@ -9,12 +9,13 @@
 
 Screen::Screen(Graphics &gfx, Mouse &m_) :
 	gfx(gfx), m(m_), desn(Design_1), // Design_x is defualt design
-	DyNgt(Vec2D(850, 50), Vec2D(925, 80), gfx, m_, DayNight),
-	SorP({ 1012, 110 }, {1612, 150}, gfx, m_, Prop),
+	DyNgt(Vec2D(850, 50), Vec2D(925, 80), gfx, m_, SwitchType::DayNight),
+	SorP({ 1012, 110 }, {1612, 150}, gfx, m_, SwitchType::Prop),
 	SLabel({1300, 40}, {1600, 80}, gfx, m_) {
 
 	//overhead
 	ShowCursor(false);
+	SorP.type = SwitchType::Prop; pTest = &SorP.toggle;
 	des.push_back(Design(gfx,Design_1)); des.push_back(Design(gfx,Design_2)); 
 	des.push_back(Design(gfx,Design_3));
 	B.push_back(Button(Vec2D(10, 10), Vec2D(250, 100), gfx, m_));
@@ -23,7 +24,7 @@ Screen::Screen(Graphics &gfx, Mouse &m_) :
 	Title.setPos(Vec2D(1100, 40));
 	std::vector<std::string> T; T.push_back("Adam Danklefsen"); T.push_back("MEE 308 Project");
 	Title.setTXT(T); B.at(desn).isPressed = true;
-	DyNgt.toggle = OFF; SorP.toggle = ON;
+	DyNgt.toggle = SwitchState::OFF; SorP.toggle = SwitchState::ON;
 
 	// Calc properties and return
 	for (int i = 0; i < 3; i++) {
@@ -58,6 +59,8 @@ Screen::Screen(Graphics &gfx, Mouse &m_) :
 	des.at(Design_3).Night_P.setTXT(night);
 	day = des.at(Design_3).Res_P.getTXT(0, 3, 9, 23); // (7,19) + (3,4)
 	des.at(Design_3).Day_P.setTXT(day); }
+
+
 }
 
 Screen::~Screen() {}
@@ -84,7 +87,7 @@ void Screen::DrawFrame() {
 		if (DyNgt.toggle != Swtoggle) { DrawBackG = true; }
 		DyNgt.Draw(gfx);
 	} 
-	auto Swtoggle = SorP.toggle;
+	SwitchState Swtoggle = SorP.toggle; SorP.type = SwitchType::Prop;
 	SorP.Press(); gfx.DrawBlank(SorP.R.TL, SorP.R.BR + Vec2D(1, 1), true);
 	if (SorP.toggle != Swtoggle) { DrawBackG = true; }
 	SorP.Draw(gfx);
@@ -103,10 +106,10 @@ void Screen::DrawBackGround() {
 	// Pipes
 	if (desn == Design_3) {
 		switch (DyNgt.toggle) {
-		case OFF:
+		case SwitchState::OFF:
 			for (int i = 0; i < 6; i++) { des.at(desn).Pipes.at(i).Draw(gfx, true); }
 			break;
-		case ON:
+		case SwitchState::ON:
 			for (int i = 6; i < des.at(desn).Pipes.size(); i++) { des.at(desn).Pipes.at(i).Draw(gfx, true); }
 			break;
 		}
@@ -133,17 +136,17 @@ void Screen::DrawBackGround() {
 	temp = des.at(desn).Res_P.getPos();
 	gfx.DrawBlank(temp, Vec2D(gfx.ScreenWidth-1, gfx.ScreenHeight-1), true);
 	if (desn == Design_3) {
-		if (DyNgt.toggle == ON) { //ON : Day,State
-			if (SorP.toggle == ON) { des.at(desn).Day_S.Draw(gfx, true); }
+		if (DyNgt.toggle == SwitchState::ON) { //ON : Day,State
+			if (SorP.toggle == SwitchState::ON) { des.at(desn).Day_S.Draw(gfx, true); }
 			else { des.at(desn).Day_P.Draw(gfx, true); }
 		}
 		else { // OFF : Night,Pipe
-			if (SorP.toggle == ON) { des.at(desn).Night_S.Draw(gfx, true); }
+			if (SorP.toggle == SwitchState::ON) { des.at(desn).Night_S.Draw(gfx, true); }
 			else { des.at(desn).Night_P.Draw(gfx, true); }
 		}
 	}
 	else {
-		if (SorP.toggle == ON) { des.at(desn).Res_S.Draw(gfx, true); }
+		if (SorP.toggle == SwitchState::ON) { des.at(desn).Res_S.Draw(gfx, true); }
 		else { des.at(desn).Res_P.Draw(gfx, true); }
 	}
 	Title.Draw(gfx, true);
@@ -186,8 +189,8 @@ void Screen::Writeout() {
 	ofstream f("../../out.txt", fstream::out); assert(f);
 	for (int i = 0; i < 3; i++) {
 		f << "Design " << i + 1 << endl;
-		string line = to_string(Totalhl.at(i)) + " " + to_string(Win.at(i)) + " " +
-			to_string(pCost.at(i)) + " " + to_string(opCost.at(i));
+		string line = to_string(Totalhl.at(i)) + " ft^2/s^2" + to_string(Win.at(i)) + " kW" +
+			to_string(pCost.at(i)) + " $" + to_string(opCost.at(i)) + " $";
 		f << line << endl;
 	}
 }
