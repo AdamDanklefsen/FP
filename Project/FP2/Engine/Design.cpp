@@ -103,7 +103,7 @@ void Design::Solve1() {
 	{
 		State &Inlet = getState("Inlet"), &B2 = getState("B2");
 		Pipe &InletB2 = getPipe("Inlet->B2");
-		InletB2.Q = 150 * .002228;
+		InletB2.Q = 150 * .002228; Qpump = 30 * .002228;
 		InletB2.D = 3.068 / 12.0; // ft
 		double D = InletB2.D; // Convinience
 		double L = InletB2.L;
@@ -240,7 +240,7 @@ void Design::Solve2() {
 		Pipe &IWT = getPipe("Inlet->WT");
 		double dz = I.Getz() - WT.Getz(); //ft
 		double L = sqrt(IWT.L*IWT.L - dz * dz) + dz;
-		double Q = 150 * .002228;
+		double Q = 150 * .002228; Qpump = 150 * .002228;
 		double D = 4.026f / 12.f; IWT.D = D;
 		I.Setv(4 * Q / pi / D / D); WT.Setv(4 * Q / pi / D / D);
 		pCost += L * Pipe::getprice(pPrice::D4);
@@ -400,7 +400,7 @@ void Design::Solve3() {
 		Pipe &S2S3 = getPipe("S2->S3"), &S3S4 = getPipe("S3->S4"), &S4WT = getPipe("S4->WT");
 		double dz = I.Getz() - WT.Getz(); //ft
 		double L = IB2.L + B2B1.L + B1S2.L + S2S3.L + S3S4.L + S4WT.L;
-		double Q = 150 * .002228;
+		double Q = 150 * .002228; Qpump = 150 * .002228;
 		double D = 4.026f / 12.f;
 		IB2.D = D; B2B1.D = D; B1S2.D = D; S2S3.D = D; S3S4.D = D; S4WT.D = D;
 		I.Setv(4 * Q / pi / D / D); WT.Setv(4 * Q / pi / D / D);

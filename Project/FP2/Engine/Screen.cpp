@@ -40,7 +40,7 @@ Screen::Screen(Graphics &gfx, Mouse &m_) :
 	for (int i = 0; i < 3; i++) {
 		des.at(i).getRes();
 		Totalhl.push_back(des.at(i).Totalhl);
-		Win.push_back(des.at(i).wp*0.7457);
+		Win.push_back(des.at(i).wp*1.94*des.at(i).Qpump);
 		pCost.push_back(des.at(i).pCost);
 		opCost.push_back(Win.at(i) * eleCost * 12); // [kW] * $/kWh * h -> $
 	}
