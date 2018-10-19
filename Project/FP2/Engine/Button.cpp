@@ -8,7 +8,7 @@ Button::~Button(){}
 void Button::Press(Button * b, void(Button::* funcp)(void)) {
 	(b->*funcp)();
 }
-void Button::Draw(Graphics &gfx) {
+void Button::Draw(Graphics &gfx, bool backg) {
 	if (changeDraw) {
 		R.Draw(gfx, false);
 		changeDraw = false;
@@ -17,7 +17,7 @@ void Button::Draw(Graphics &gfx) {
 		R.Draw(gfx, true);
 	}
 	if(txt.getlen()>0) {
-		txt.Draw(gfx, true);
+		txt.Draw(gfx, backg);
 	}
 }
 void Button::disp() {

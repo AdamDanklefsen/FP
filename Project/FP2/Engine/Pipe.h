@@ -7,6 +7,15 @@
 #include <assert.h>
 #include <functional>
 
+enum pPrice {
+	D1p25 = 383,
+	D1p5 = 5443,
+	D2 = 776,
+	D2p5  = 1158,
+	D3 = 1359,
+	D4 = 2158
+};
+
 class Pipe {
 public:
 	Pipe(State &S1, State &S2); //Assume direstion is 1->2
@@ -20,6 +29,7 @@ public:
 		BranchTh, ///
 		BranchOut ///
 	};
+	static inline double getprice(pPrice p) { return p / 10; }
 	struct mHLKParam {
 		Fitting f; //Fitting Type
 		double D; // Controlling Diameter
@@ -35,12 +45,14 @@ public:
 	static double HL(double L, double Q, double D);
 	static double Pvmid(State &s, double h, double L, double Q, double D);
 	static double mHLK(mHLKParam p);
+	static double HLmin(double L, double Q, mHLKParam p, double D);
 	static double HLtot(double L, double Q, std::vector<mHLKParam> p, double D);
+	static double findThrot(double res, double L, double Q, double p, double D);
 
 	static std::string getRes(State &s);
 	static std::string getRes2(Pipe &p);
 	double L, D = 0, ff = 0, v = 0, Q;
-	static constexpr double e = .0018f/12.f; //ft //roughness of Steel
+	static constexpr double e = 6.5617e-5/12.f; //ft //roughness of Steel
 	static constexpr double rho = 1.94, mu = 1.791e-5;
 	std::string name;
 	std::vector<State> in, out; // vectors for branches, may not be needed

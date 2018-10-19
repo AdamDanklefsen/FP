@@ -17,7 +17,7 @@ public:
 	bool changeDraw = false;
 
 	void Press(Button* b, void(Button::*funcp)(void));
-	void Draw(Graphics &gfx);
+	void Draw(Graphics &gfx, bool backg);
 	void disp();
 	int CheckPressed();
 	void setTXT(std::string s);

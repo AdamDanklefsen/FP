@@ -94,7 +94,7 @@ double Pipe::mHLK(mHLKParam p) {
 		K = .16f;
 		return K;
 	case Throttle:
-		K = p.p / p.D; //RegresseD from table
+		K = p.p / p.D; //Regressed from table
 		K = 282.25*pow(K, 4.f) - 838.43*pow(K, 3.f) + 929.22*K*K - 462.3*K + 89.438;
 		return K;
 	case Compression:
@@ -113,6 +113,12 @@ double Pipe::mHLK(mHLKParam p) {
 		throw std::invalid_argument("Invalid Fitting");
 	}
 }
+double Pipe::HLmin(double L, double Q, mHLKParam p, double D) {
+	double K = 0;
+		K = mHLK(p);
+	double v = 4 * Q / pi / D / D;
+	return(K * v * v / 2);
+}
 // Total Length in Seg. FlowRate in Seg. minorHLParam, D
 double Pipe::HLtot(double L, double Q, std::vector<mHLKParam> p, double D) {
 	double K = 0;
@@ -122,6 +128,17 @@ double Pipe::HLtot(double L, double Q, std::vector<mHLKParam> p, double D) {
 	K += ffactor(rho*Q*4.f/D/pi/mu, e/D, .02) * L/D;
 	double v = 4 * Q / pi / D / D;
 	return(K * v * v / 2);
+}
+double Pipe::findThrot(double res, double L, double Q, double p, double D) {
+	long double x, xp, h = .0001; double v = 4 * Q / pi / D / D;
+	double z = p;
+	do {
+		x = (282.25*pow(z, 4.f) - 838.43*pow(z, 3.f) + 929.22*z*z - 462.3*z + 89.438)*v*v / 2 - res;
+		xp = (1129.0*z*z*z - 2515.29*z*z+ 1858.44*z - 462.3)*v*v / 2;
+		z -= x / xp;
+		assert(z > 0); // Use another Throttle
+	} while (abs(x) > h);
+	return z;
 }
 
 std::string Pipe::getRes(State & s) {

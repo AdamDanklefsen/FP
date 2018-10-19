@@ -2,15 +2,16 @@
 #include <d2d1.h>
 
 // TODO
-// Des2/3
 // Sensitivity stuff
 // Cost Analysis
+// Draw Graphs 
 
 
 Screen::Screen(Graphics &gfx, Mouse &m_) :
 	gfx(gfx), m(m_), desn(Design_1), // Design_x is defualt design
 	DyNgt(Vec2D(850, 50), Vec2D(925, 80), gfx, m_, DayNight),
-	SorP({ 1012, 110 }, {1612, 150}, gfx, m_, Prop) {
+	SorP({ 1012, 110 }, {1612, 150}, gfx, m_, Prop),
+	SLabel({1300, 40}, {1600, 80}, gfx, m_) {
 
 	//overhead
 	ShowCursor(false);
@@ -24,6 +25,7 @@ Screen::Screen(Graphics &gfx, Mouse &m_) :
 	Title.setTXT(T); B.at(desn).isPressed = true;
 	DyNgt.toggle = OFF; SorP.toggle = ON;
 
+	// Calc properties and return
 	for (int i = 0; i < 3; i++) {
 		des.at(i).defineStates();
 		des.at(i).definePipes();
@@ -31,12 +33,20 @@ Screen::Screen(Graphics &gfx, Mouse &m_) :
 		des.at(i).Res_S.setPos(Vec2D(1000, 200)); // Default locations if need be 
 		des.at(i).Res_P.setPos(Vec2D(1000, 200));
 	}
-	des.at(0).Solve1();
-	des.at(1).Solve2();
-	//des.at(2).Solve3();
-	for (int i = 0; i < 3; i++) { des.at(i).getRes(); }
+	des.at(Design_1).Solve1();
+	des.at(Design_2).Solve2();
+	des.at(Design_3).Solve3();
+	for (int i = 0; i < 3; i++) {
+		des.at(i).getRes();
+		Totalhl.push_back(des.at(i).Totalhl);
+		Win.push_back(des.at(i).wp*0.7457);
+		pCost.push_back(des.at(i).pCost);
+		opCost.push_back(Win.at(i) * eleCost * 12); // [kW] * $/kWh * h -> $
+	}
+	Writeout();
+
 	// Design_3 results
-	des.at(Design_3).Day_S.setPos({ 1000, 200 });
+	{des.at(Design_3).Day_S.setPos({ 1000, 200 });
 	des.at(Design_3).Day_P.setPos({ 1000, 200 });
 	des.at(Design_3).Night_S.setPos({ 1000, 200 });
 	des.at(Design_3).Night_P.setPos({ 1000, 200 });
@@ -44,10 +54,10 @@ Screen::Screen(Graphics &gfx, Mouse &m_) :
 	des.at(Design_3).Night_S.setTXT(night);
 	auto day = des.at(Design_3).Res_S.getTXT(0, 8, 12, 19); // (0,4)U(9,15) + (3,4)
 	des.at(Design_3).Day_S.setTXT(day);
-	night = des.at(Design_3).Res_P.getTXT(0, 10); // (0,6) + (3,4)
+	night = des.at(Design_3).Res_P.getTXT(0, 9); // (0,6) + (3,4)
 	des.at(Design_3).Night_P.setTXT(night);
-	day = des.at(Design_3).Res_P.getTXT(0,3, 9, 23); // (7,19) + (3,4)
-	des.at(Design_3).Day_P.setTXT(day);
+	day = des.at(Design_3).Res_P.getTXT(0, 3, 9, 23); // (7,19) + (3,4)
+	des.at(Design_3).Day_P.setTXT(day); }
 }
 
 Screen::~Screen() {}
@@ -56,11 +66,15 @@ void Screen::DrawFrame() {
 	// State HighLights
 	TestCol();
 	for (int i = 0; i < des.at(desn).States.size(); i++) {
-		if (des.at(desn).States.at(i).isHigh) { des.at(desn).States.at(i).R.Draw(gfx, false); }
+		if (des.at(desn).States.at(i).isHigh) {
+			des.at(desn).States.at(i).R.Draw(gfx, false);
+			SLabel.setTXT(des.at(desn).States.at(i).Getname());
+			SLabel.Draw(gfx,false);
+		}
 	}
 	//ReDraw Buttons
 	for (int i = 0; i < B.size(); i++) {
-		B.at(i).Draw(gfx);
+		B.at(i).Draw(gfx, true);
 	}
 	// Switch
 	gfx.DrawBlank(DyNgt.R.TL, DyNgt.R.BR + Vec2D(1, 1), true);
@@ -110,7 +124,7 @@ void Screen::DrawBackGround() {
 	}
 	// Buttons - needs to be after states
 	for (int i = 0; i < B.size(); i++) {
-		B.at(i).Draw(gfx);
+		B.at(i).Draw(gfx, true);
 	}
 
 	//Text
@@ -148,11 +162,11 @@ void Screen::TestCol() {
 		switch (B.at(i).CheckPressed()) {
 		case 1: // Draw || Pressed -> Draw
 			FlushButtonPress(); B.at(i).isPressed = true;
-			B.at(i).Draw(gfx);
+			B.at(i).Draw(gfx, true);
 			break;
 		case 2: // Draw && Pressed
 			FlushButtonPress(); B.at(i).isPressed = true; desn = DesignNumber(i);
-			B.at(i).Draw(gfx);
+			B.at(i).Draw(gfx, true);
 			DrawBackG = true; 
 			break;
 		default:// Neither
@@ -164,5 +178,16 @@ void Screen::TestCol() {
 void Screen::FlushButtonPress() {
 	for (int i = 0; i < B.size(); i++) {
 		B.at(i).isPressed = false;
+	}
+}
+
+void Screen::Writeout() {
+	using namespace std;
+	fstream f("../../out.txt");
+	for (int i = 0; i < 3; i++) {
+		f << "Design " << i + 1 << endl;
+		string line = to_string(Totalhl.at(i)) + " " + to_string(Win.at(i)) + " " +
+			to_string(pCost.at(i)) + " " + to_string(opCost.at(i));
+		f << line << endl;
 	}
 }

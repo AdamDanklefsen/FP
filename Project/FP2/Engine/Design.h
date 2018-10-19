@@ -9,7 +9,7 @@
 #include "Text.h"
 #include <functional>
 
-typedef enum DesignNumber {
+enum DesignNumber {
 	Design_1,
 	Design_2,
 	Design_3
@@ -31,12 +31,14 @@ public:
 	void definePipes();
 	void Solve1();
 	void Solve2();
+	void Solve3();
 	void getRes();
 	void getSProp();
 
 	double pi = 3.14159269358979;
 	std::vector<Pipe> Pipes;
 	std::vector<State> States;
+	double Totalhl = 0, wp, pCost = 0;
 	double x = 1165.561*2; double y = 1061.7255*2; // also defined in State.h
 	int borderx = 75; int bordery = 50;
 	Graphics &gfx;
